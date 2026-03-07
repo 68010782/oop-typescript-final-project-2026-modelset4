@@ -23,7 +23,7 @@ export class TasksController {
     
     constructor(private tasksService: TasksService) {}
 
-    @ApiOperation({ summary: 'Create tasks' })
+    @ApiOperation({ summary: 'Create new tasks' })
     @ApiResponse({ status: 200, description: 'Task created successfully' })
     @Post()
     createTask(@Body() dto: CreateTaskDto){
