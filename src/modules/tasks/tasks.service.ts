@@ -20,7 +20,7 @@ export class TasksService {
 
     }
 
-    getTaskById(id: string): task {
+    getTaskById(id: string): Task {
 
         const task = this.tasks.find(t => t.id === id);
 
@@ -37,7 +37,7 @@ export class TasksService {
         const task: Task = {
             id: uuid(),
             title: dto.title,
-            deadline: dto.deadline,
+            deadline: new Date(dto.deadline),
             projectId: dto.projectId,
             status: TaskStatus.OPEN
         };
