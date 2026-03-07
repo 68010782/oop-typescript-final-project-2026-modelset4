@@ -1,11 +1,14 @@
-import { Controller,Get,Post,Put,Delete,Param,Body,Patch,ParseIntPipe,HttpStatus } from '@nestjs/common';
+import { Controller,Get,Post,Put,Delete,Param,Body,Patch,ParseIntPipe } from '@nestjs/common';
 import { ProjectService } from './project.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { ApiResponse } from '../../common/interfaces/api-response.interface';
 import { Project } from './project.interface';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { ApiTags } from '@nestjs/swagger';
+import { ApiResponse as SwaggerApiResponse,ApiOperation } from '@nestjs/swagger';
 
 
+@ApiTags('projects')
 @Controller('projects')
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
@@ -21,6 +24,8 @@ export class ProjectController {
     };
   }
 
+  @ApiOperation({ summary: 'Get all projects' })
+  @SwaggerApiResponse({ status: 200, description: 'Projects retrieved successfully' })
   @Get()
   findAll(): ApiResponse<Project[]> {
     return {
