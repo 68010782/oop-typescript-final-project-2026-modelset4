@@ -2,6 +2,7 @@ import {
     Controller,
     Get,
     Post,
+    Put,
     Patch,
     Delete,
     Param,
@@ -18,8 +19,13 @@ export class TasksController {
     
     constructor(private tasksService: TasksService) {}
 
+    @Post()
+    createTask(@Body() dto: CreateTaskDto){
+        return this.tasksService.createTask(dto);
+    }
+
     @Get()
-    getTasks(@Query('projectId') projectId?: string){
+    getTasks(@Query('projectId') projectId?: number){
         return this.tasksService.getAllTasks(projectId);
     }
 
@@ -28,17 +34,14 @@ export class TasksController {
         return this.tasksService.getTaskById(id);
     }
 
-    @Post()
-    createTask(@Body() dto: CreateTaskDto){
-        return this.tasksService.createTask(dto);
+    @Put(':id')
+    updateTask(@Param('id') id: string, @Body() dto: UpdateTaskDto) {
+        return this.tasksService.updatetask(id, dto);
     }
 
     @Patch(':id')
-    updateTask(
-        @Param('id') id: string,
-        @Body() dto: UpdateTaskDto
-    ){
-        return this.tasksService.updatetask(id, dto);
+    patchTask(@Param('id') id: string, @Body() dto: UpdateTaskDto) {
+        return this.tasksService.patchTask(id, dto);
     }
 
     @Delete(':id')

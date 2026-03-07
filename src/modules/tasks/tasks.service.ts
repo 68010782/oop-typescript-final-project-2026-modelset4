@@ -5,12 +5,19 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import {v4 as uuid} from 'uuid';
 
+
 @Injectable()
 export class TasksService {
 
+    
+  findByProjectId(projectId: number): Task[] {
+        return this.tasks.filter(task => task.projectId === projectId);
+    }
+
+
     private tasks: Task[] = [];
 
-    getAllTasks(projectId?: string): Task[] {
+    getAllTasks(projectId?: number): Task[] {
         if (projectId){
             return this.tasks.filter(task => task.projectId === projectId);
         }
@@ -49,6 +56,16 @@ export class TasksService {
         Object.assign(task,dto);
         return task;
 
+    }
+    patchTask(id: string, dto: UpdateTaskDto) {
+        const task = this.tasks.find(t => t.id === id);
+
+        if (!task) {
+        throw new NotFoundException('Task not found');
+        }
+
+        Object.assign(task, dto);
+        return task;
     }
 
     deleteTask(id: string): void{

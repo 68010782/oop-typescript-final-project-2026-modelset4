@@ -57,7 +57,20 @@ export class ProjectController {
       data: this.projectService.update(id, dto),
     };
   }
+   
+  @Patch(':id')
+    patch(
+     @Param('id', ParseIntPipe) id: number,
+     @Body() dto: UpdateProjectDto,
+    ): ApiResponse<Project> {
+    return {
+        success: true,
+        message: 'Project updated partially',
+        data: this.projectService.patch(id, dto),
+        };
+    }
 
+  
   @Delete(':id')
   remove(
     @Param('id', ParseIntPipe) id: number,
@@ -71,15 +84,5 @@ export class ProjectController {
     };
   }
 
-    @Patch(':id')
-    patch(
-     @Param('id', ParseIntPipe) id: number,
-     @Body() dto: UpdateProjectDto,
-    ): ApiResponse<Project> {
-    return {
-        success: true,
-        message: 'Project updated partially',
-        data: this.projectService.patch(id, dto),
-        };
-    }
+  
 }

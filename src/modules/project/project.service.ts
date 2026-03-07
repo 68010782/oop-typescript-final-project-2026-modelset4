@@ -3,10 +3,14 @@ import { Project } from './project.interface';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 
+
 @Injectable()
 export class ProjectService {
   private projects: Project[] = [];
   private nextId = 1;
+  constructor(
+  private readonly tasksService: TasksService
+  ) {}
 
   create(dto: CreateProjectDto): Project {
     const deadlineDate = new Date(dto.deadline);
@@ -80,22 +84,21 @@ export class ProjectService {
       );
     }
 
-    project.deadline = deadlineDate;
-  }
+    project.deadline = deadlineDate;}
 
-  if (dto.name !== undefined) {
-    project.name = dto.name;
-  }
+      if (dto.name !== undefined) {
+        project.name = dto.name;
+      }
 
-  if (dto.description !== undefined) {
-    project.description = dto.description;
-  }
+      if (dto.description !== undefined) {
+        project.description = dto.description;
+      }
 
-  if (dto.status !== undefined) {
-    project.status = dto.status;
-  }
+      if (dto.status !== undefined) {
+        project.status = dto.status;
+      }
 
-  return project;
+    return project;
   }
 }
 

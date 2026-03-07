@@ -9,6 +9,6 @@ export class CreateTaskDto {
     deadline!: string;
 
     @IsString()
-    projectId!: string;
+    projectId!: number;
 
 }
