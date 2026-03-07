@@ -1,13 +1,16 @@
 import { Injectable,BadRequestException,NotFoundException } from '@nestjs/common';
 import { Project } from './project.interface';
 import { CreateProjectDto } from './dto/create-project.dto';
-import { ProjectStatus } from './project-status.enum';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { TasksService } from '../tasks/tasks.service';
 
 @Injectable()
 export class ProjectService {
   private projects: Project[] = [];
   private nextId = 1;
+  constructor(
+  private readonly tasksService: TasksService
+  ) {}
 
   create(dto: CreateProjectDto): Project {
     const deadlineDate = new Date(dto.deadline);
@@ -60,14 +63,26 @@ export class ProjectService {
     return project;
   }
 
-  remove(id: number): void {
-    const index = this.projects.findIndex((p) => p.id === id);
+  remove(id: number) {
+    const tasks = this.tasksService.findByProjectId(id);
+
+    if (tasks.length > 0) {
+      throw new BadRequestException(
+        'Cannot delete project with existing tasks',
+      );
+    }
+
+    const index = this.projects.findIndex(p => p.id === id);
 
     if (index === -1) {
       throw new NotFoundException('Project not found');
     }
 
     this.projects.splice(index, 1);
+
+    return {
+      message: 'Project deleted successfully'
+    };
   }
   patch(id: number, dto: UpdateProjectDto): Project {
   const project = this.findOne(id);
@@ -81,23 +96,21 @@ export class ProjectService {
       );
     }
 
-    project.deadline = deadlineDate;
-  }
+    project.deadline = deadlineDate;}
 
-  if (dto.name !== undefined) {
-    project.name = dto.name;
-  }
+      if (dto.name !== undefined) {
+        project.name = dto.name;
+      }
 
-  if (dto.description !== undefined) {
-    project.description = dto.description;
-  }
+      if (dto.description !== undefined) {
+        project.description = dto.description;
+      }
 
-  if (dto.status !== undefined) {
-    project.status = dto.status;
-  }
+      if (dto.status !== undefined) {
+        project.status = dto.status;
+      }
 
-  return project;
+    return project;
   }
 }
 
-// TODO: Prevent deletion if project has tasks
