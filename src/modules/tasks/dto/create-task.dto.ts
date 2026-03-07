@@ -13,7 +13,7 @@ export class CreateTaskDto {
 
     @ApiProperty({
         example: "2026-12-31",
-        description: "Task deadline (YYYY-MM-DD)"
+        description: "Task deadline in ISO date format (YYYY-MM-DD)"
       })
     @IsDateString()
     deadline!: string;

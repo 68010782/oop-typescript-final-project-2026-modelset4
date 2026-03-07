@@ -21,7 +21,7 @@ export class CreateProjectDto {
   description!: string;
 
   @ApiProperty({
-    example: "Active,Cancleled",
+    example: "active",
     description: "Status of projects"
   })
   @IsEnum(ProjectStatus)
@@ -29,7 +29,7 @@ export class CreateProjectDto {
 
   @ApiProperty({
     example: "2026-12-31",
-    description: "Project deadline (YYYY-MM-DD)"
+    description: "Project deadline in ISO date format (YYYY-MM-DD)"
   })
   @IsDateString()
   deadline!: string;
