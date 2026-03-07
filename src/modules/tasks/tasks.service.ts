@@ -13,15 +13,12 @@ export class TasksService {
     getAllTasks(projectId?: string): Task[] {
         if (projectId){
             return this.tasks.filter(task => task.projectId === projectId);
-        
         }
 
         return this.tasks;
-
     }
 
     getTaskById(id: string): Task {
-
         const task = this.tasks.find(t => t.id === id);
 
         if (!task){
@@ -29,7 +26,6 @@ export class TasksService {
         }
 
         return task;
-
     }
 
     createTask(dto: CreateTaskDto): Task{
@@ -43,7 +39,6 @@ export class TasksService {
         };
 
         this.tasks.push(task);
-
         return task;
 
     }
@@ -52,7 +47,6 @@ export class TasksService {
         const task = this.getTaskById(id);
 
         Object.assign(task,dto);
-
         return task;
 
     }
@@ -60,7 +54,6 @@ export class TasksService {
     deleteTask(id: string): void{
 
         const task = this.getTaskById(id);
-
         this.tasks = this.tasks.filter(t => t.id !== task.id);
         
     }
