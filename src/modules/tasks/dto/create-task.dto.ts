@@ -1,13 +1,14 @@
 import {IsString, IsDateString} from 'class-validator';
 
 export class CreateTaskDto {
+
     @IsString()
-    title: string;
+    title!: string;
 
     @IsDateString()
-    deadline: Date;
+    deadline!: string;
 
     @IsString()
-    projectId: string;
-    
+    projectId!: string;
+
 }
