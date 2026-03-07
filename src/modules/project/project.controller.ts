@@ -13,6 +13,8 @@ import { ApiResponse as SwaggerApiResponse,ApiOperation } from '@nestjs/swagger'
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
+  @ApiOperation({ summary: 'Create projects' })
+  @SwaggerApiResponse({ status: 200, description: 'Projects retrieved successfully' })
   @Post()
   create(@Body() dto: CreateProjectDto): ApiResponse<Project> {
     const project = this.projectService.create(dto);

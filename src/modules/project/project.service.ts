@@ -2,7 +2,7 @@ import { Injectable,BadRequestException,NotFoundException } from '@nestjs/common
 import { Project } from './project.interface';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
-
+import { TasksService } from '../tasks/tasks.service';
 
 @Injectable()
 export class ProjectService {
@@ -63,14 +63,26 @@ export class ProjectService {
     return project;
   }
 
-  remove(id: number): void {
-    const index = this.projects.findIndex((p) => p.id === id);
+  remove(id: number) {
+    const tasks = this.tasksService.findByProjectId(id);
+
+    if (tasks.length > 0) {
+      throw new BadRequestException(
+        'Cannot delete project with existing tasks',
+      );
+    }
+
+    const index = this.projects.findIndex(p => p.id === id);
 
     if (index === -1) {
       throw new NotFoundException('Project not found');
     }
 
     this.projects.splice(index, 1);
+
+    return {
+      message: 'Project deleted successfully'
+    };
   }
   patch(id: number, dto: UpdateProjectDto): Project {
   const project = this.findOne(id);
@@ -102,4 +114,3 @@ export class ProjectService {
   }
 }
 
-// TODO: Prevent deletion if project has tasks
