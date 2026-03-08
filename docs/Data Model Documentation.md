@@ -22,6 +22,11 @@ Project ใช้แทนข้อมูลของโปรเจคในร
 | status | ProjectStatus | สถานะของโปรเจค |
 | deadline | Date | วันกำหนดส่งของโปรเจค |
 | createdAt | Date | วันที่สร้างโปรเจค |
+| startDate | Date | วันที่เริ่ม |
+| owner | string | เจ้าของโปรเจค |
+| budget | number | งบประมาณ |
+| priority | string | ลำดับความสำคัญ |
+| category | string | จัดประเภท |
 
 ## Project Status
 
@@ -43,7 +48,15 @@ Project ใช้แทนข้อมูลของโปรเจคในร
   "description": "Backend API for tracking projects",
   "status": "active",
   "deadline": "2026-12-31",
-  "createdAt": "2026-01-01"
+  "createdAt": "2026-01-01",
+  "description" : "this task is for you",
+  "priority" : "VERY",
+  "owner" : "OOP",
+  "updateAt" : "2026-01-01" ,
+  "budget" : 20,
+  "category" : "PROGRAMMING",
+  "startDate" : "2026-01-01"
+
 }
 
 # Task Model
@@ -63,6 +76,11 @@ Task จะมีสถานะของงาน เช่น ยังไม�
 | status | TaskStatus | สถานะของงาน |
 | deadline | Date | วันกำหนดส่งของงาน |
 | projectId | number | รหัสของโปรเจคที่งานนี้อยู่ |
+| description | string |  คำอธิบายงานนี้ |
+| priority | string | ลำดับความสำคัญ |
+| assignedTo | string | งานนี้ของใคร |
+| updateAt | string | อัพเดทวันที่ |
+| createAt | string | สร้างเมื่อวันที่ |
 
 ---
 
@@ -86,5 +104,11 @@ Task จะมีสถานะของงาน เช่น ยังไม�
   "title": "Login Project",
   "status": "OPEN",
   "deadline": "2026-12-20",
-  "projectId": 1
+  "projectId": 1,
+  "description" : "this task is for you",
+  "priority" : "VERY",
+  "assignedTo" : "OOP",
+  "updateAt" : "2026-01-01" ,
+  "createAt" : "2026-01-01"
+
 }
