@@ -1,7 +1,6 @@
 import { Injectable,BadRequestException,NotFoundException } from '@nestjs/common';
 import { Project } from './project.interface';
 import { CreateProjectDto } from './dto/create-project.dto';
-import { ProjectStatus } from './project-status.enum';
 import { UpdateProjectDto } from './dto/update-project.dto';
 
 @Injectable()
