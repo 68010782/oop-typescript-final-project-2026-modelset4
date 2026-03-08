@@ -48,7 +48,7 @@ export class TasksController {
     @ApiResponse({ status: 200, description: 'Task updated successfully' })
     @Put(':id')
     updateTask(@Param('id') id: string, @Body() dto: UpdateTaskDto) {
-        return this.tasksService.updatetask(id, dto);
+        return this.tasksService.updateTask(id, dto);
     }
 
     @ApiOperation({ summary: 'Patch task by id' })
