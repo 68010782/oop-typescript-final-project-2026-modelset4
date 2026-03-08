@@ -1,28 +1,28 @@
-import {IsString, IsDateString, IsNumber} from 'class-validator';
+import {IsString, IsDateString} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-
 
 export class CreateTaskDto {
 
     @ApiProperty({
-        example: "ADD features",
-        description: "Title/Name of the task"
-      })
+        example: "Finish API documentation",
+        description: "Task title"
+    })
     @IsString()
     title!: string;
 
     @ApiProperty({
-        example: "2026-12-31",
-        description: "Task deadline in ISO date format (YYYY-MM-DD)"
-      })
+        example: "2026-12-12",
+        description: "Task deadline(ISO date format)"
+    })
     @IsDateString()
     deadline!: string;
 
+
     @ApiProperty({
-        example: "1",
-        description: "ProjectId of the task"
-      })
-    @IsNumber()
-    projectId!: number;
+        example: "project123",
+        description: "Project ID that this task belongs to"
+    })
+    @IsString()
+    projectId!: string;
 
 }
