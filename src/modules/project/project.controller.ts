@@ -79,7 +79,7 @@ export class ProjectController {
   }
 
   @ApiOperation({ summary: 'Delete project by id' })
-  @SwaggerApiResponse({ status: 201, description: 'Project deleted successfully' })
+  @SwaggerApiResponse({ status: 200, description: 'Project deleted successfully' })
   @Delete(':id')
   remove(
     @Param('id', ParseIntPipe) id: number,
