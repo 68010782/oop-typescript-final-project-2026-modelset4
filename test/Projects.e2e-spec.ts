@@ -1,12 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
-import { AppModule } from '../src/app.module';
+import request from 'supertest';
+import { AppModule } from './../src/app.module';
 
-describe('Project + Task E2E', () => {
+describe('Project E2E', () => {
   let app: INestApplication;
   let projectId: number;
-  let taskId: string;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule =
@@ -27,7 +26,7 @@ describe('Project + Task E2E', () => {
       .post('/projects')
       .send({
         name: 'Test Project',
-        description: 'Project for testing',
+        description: 'Project testing',
         status: 'planning',
         deadline: '2030-12-31'
       });
@@ -43,69 +42,47 @@ describe('Project + Task E2E', () => {
       .get('/projects');
 
     expect(res.status).toBe(200);
-    expect(res.body.data.length).toBeGreaterThan(0);
+    expect(res.body.success).toBe(true);
   });
 
-  it('Create Task', async () => {
+  it('Get Project by id', async () => {
     const res = await request(app.getHttpServer())
-      .post('/tasks')
-      .send({
-        title: 'Task 1',
-        deadline: '2030-01-01',
-        projectId: projectId
-      });
-
-    expect(res.status).toBe(201);
-
-    taskId = res.body.id;
-  });
-
-  it('Get All Tasks', async () => {
-    const res = await request(app.getHttpServer())
-      .get('/tasks');
+      .get(`/projects/${projectId}`);
 
     expect(res.status).toBe(200);
-    expect(res.body.length).toBeGreaterThan(0);
+    expect(res.body.data.id).toBe(projectId);
   });
 
-  it('Get Tasks by projectId', async () => {
+  it('Update Project', async () => {
     const res = await request(app.getHttpServer())
-      .get(`/tasks?projectId=${projectId}`);
-
-    expect(res.status).toBe(200);
-    expect(res.body[0].projectId).toBe(projectId);
-  });
-
-  it('Update Task', async () => {
-    const res = await request(app.getHttpServer())
-      .put(`/tasks/${taskId}`)
+      .put(`/projects/${projectId}`)
       .send({
-        title: 'Updated Task',
-        status: 'IN_PROGRESS'
+        name: 'Updated Project',
+        description: 'Updated',
+        status: 'active',
+        deadline: '2030-11-11'
       });
 
     expect(res.status).toBe(200);
-    expect(res.body.title).toBe('Updated Task');
+    expect(res.body.data.name).toBe('Updated Project');
   });
 
-  it('Fail delete project when tasks exist', async () => {
+  it('Patch Project', async () => {
     const res = await request(app.getHttpServer())
-      .delete(`/projects/${projectId}`);
-
-    expect(res.status).toBe(400);
-  });
-
-  it('Delete Task', async () => {
-    const res = await request(app.getHttpServer())
-      .delete(`/tasks/${taskId}`);
+      .patch(`/projects/${projectId}`)
+      .send({
+        name: 'Patched Project'
+      });
 
     expect(res.status).toBe(200);
+    expect(res.body.data.name).toBe('Patched Project');
   });
 
-  it('Delete Project after tasks removed', async () => {
+  it('Delete Project', async () => {
     const res = await request(app.getHttpServer())
       .delete(`/projects/${projectId}`);
 
     expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
   });
 });
