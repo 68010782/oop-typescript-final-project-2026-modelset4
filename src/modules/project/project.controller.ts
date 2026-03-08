@@ -14,7 +14,7 @@ export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
   @ApiOperation({ summary: 'Create new projects' })
-  @SwaggerApiResponse({ status: 200, description: 'Project created successfully' })
+  @SwaggerApiResponse({ status: 201, description: 'Project created successfully' })
   @Post()
   create(@Body() dto: CreateProjectDto): ApiResponse<Project> {
     const project = this.projectService.create(dto);
@@ -79,7 +79,7 @@ export class ProjectController {
   }
 
   @ApiOperation({ summary: 'Delete project by id' })
-  @SwaggerApiResponse({ status: 200, description: 'Project deleted successfully' })
+  @SwaggerApiResponse({ status: 201, description: 'Project deleted successfully' })
   @Delete(':id')
   remove(
     @Param('id', ParseIntPipe) id: number,
