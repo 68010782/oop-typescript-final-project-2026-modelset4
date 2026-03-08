@@ -32,7 +32,7 @@ export class TasksController {
   @ApiResponse({ status: 200, description: 'Tasks retrieved successfully' })
   @Get()
   getTasks(@Query('projectId') projectId?: string) {
-    return this.tasksService.getAllTasks(projectId);
+    return this.tasksService.getAllTasks(Number(projectId!));
   }
 
   @ApiOperation({ summary: 'Get task by id' })
