@@ -50,7 +50,7 @@ export class TasksController {
     @Param('id') id: string,
     @Body() dto: UpdateTaskDto
   ) {
-    return this.tasksService.updatetask(id, dto);
+    return this.tasksService.updateTask(id, dto);
   }
 
   @ApiOperation({ summary: 'Delete task by id' })
