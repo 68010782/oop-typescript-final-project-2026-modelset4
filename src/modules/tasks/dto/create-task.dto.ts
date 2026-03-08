@@ -1,7 +1,6 @@
-import {IsString, IsDateString, IsNumber,IsNotEmpty} from 'class-validator';
+import { IsString, IsDateString, IsNumber, IsNotEmpty, IsEnum } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { TaskStatus } from '../task-status.enum';
-
 
 export class CreateTaskDto {
 
@@ -16,7 +15,7 @@ export class CreateTaskDto {
   description!: string;
 
   @ApiProperty({ example: "todo" })
-  @IsString()
+  @IsEnum(TaskStatus)
   status!: TaskStatus;
 
   @ApiProperty({ example: "high" })
@@ -42,4 +41,5 @@ export class CreateTaskDto {
   @ApiProperty({ example: "2026-03-08" })
   @IsDateString()
   updatedAt!: string;
+
 }

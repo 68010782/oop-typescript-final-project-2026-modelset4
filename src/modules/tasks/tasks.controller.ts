@@ -7,8 +7,7 @@ import {
   Delete,
   Param,
   Body,
-  Query,
-  ParseIntPipe
+  Query
 } from '@nestjs/common';
 
 import { TasksService } from './tasks.service';
@@ -22,7 +21,7 @@ export class TasksController {
 
   constructor(private tasksService: TasksService) {}
 
-  @ApiOperation({ summary: 'Create new tasks' })
+  @ApiOperation({ summary: 'Create new task' })
   @ApiResponse({ status: 201, description: 'Task created successfully' })
   @Post()
   createTask(@Body() dto: CreateTaskDto) {
@@ -46,22 +45,19 @@ export class TasksController {
     return this.tasksService.getTaskById(id);
   }
 
-  @ApiOperation({ summary: 'Put task by id' })
-  @ApiResponse({ status: 200, description: 'Task updated successfully' })
+  @ApiOperation({ summary: 'Update task fully' })
   @Put(':id')
   updateTask(@Param('id') id: string, @Body() dto: UpdateTaskDto) {
     return this.tasksService.updateTask(id, dto);
   }
 
-  @ApiOperation({ summary: 'Patch task by id' })
-  @ApiResponse({ status: 200, description: 'Task updated partially' })
+  @ApiOperation({ summary: 'Update task partially' })
   @Patch(':id')
   patchTask(@Param('id') id: string, @Body() dto: UpdateTaskDto) {
     return this.tasksService.patchTask(id, dto);
   }
 
   @ApiOperation({ summary: 'Delete task by id' })
-  @ApiResponse({ status: 200, description: 'Task deleted successfully' })
   @Delete(':id')
   deleteTask(@Param('id') id: string) {
 
@@ -72,4 +68,5 @@ export class TasksController {
       message: 'Task deleted successfully'
     };
   }
+
 }

@@ -1,19 +1,21 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import * as request from 'supertest';
+import request from 'supertest';
 import { AppModule } from './../src/app.module';
 
 const internalErrors: string[] = [];
 function check500(res: request.Response, label: string) {
-  if (res.status === 500) {
-    internalErrors.push(label);
-  }
+  if (res.status === 500) internalErrors.push(label);
 }
 
-describe('Task/Project Tracking API (e2e)', () => {
+describe('App API (e2e)', () => {
   let app: INestApplication;
 
-  const futureDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+  const projectDeadline = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .split('T')[0];
+
+  const taskDeadline = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
     .toISOString()
     .split('T')[0];
 
@@ -21,7 +23,7 @@ describe('Task/Project Tracking API (e2e)', () => {
     name: 'Alpha Project',
     description: 'Test project',
     status: 'planning',
-    deadline: futureDate,
+    deadline: projectDeadline,
   };
 
   let createdProjectId: number;
@@ -46,6 +48,10 @@ describe('Task/Project Tracking API (e2e)', () => {
   afterAll(async () => {
     await app.close();
   });
+
+  // ═══════════════════════════════════════
+  // PROJECTS
+  // ═══════════════════════════════════════
 
   describe('POST /projects', () => {
     it('201 — creates a project with valid data', async () => {
@@ -72,7 +78,7 @@ describe('Task/Project Tracking API (e2e)', () => {
     it('400 — invalid status enum', async () => {
       const res = await request(app.getHttpServer())
         .post('/projects')
-        .send({ ...validProject, status: 'INVALID_STATUS' });
+        .send({ ...validProject, status: 'INVALID' });
       check500(res, 'POST /projects — bad enum');
 
       expect(res.status).toBe(400);
@@ -91,7 +97,7 @@ describe('Task/Project Tracking API (e2e)', () => {
       const res = await request(app.getHttpServer())
         .post('/projects')
         .send({ ...validProject, deadline: 'not-a-date' });
-      check500(res, 'POST /projects — bad date format');
+      check500(res, 'POST /projects — bad date');
 
       expect(res.status).toBe(400);
     });
@@ -203,15 +209,15 @@ describe('Task/Project Tracking API (e2e)', () => {
     });
   });
 
+  // ═══════════════════════════════════════
+  // TASKS
+  // ═══════════════════════════════════════
+
   describe('POST /tasks', () => {
     it('201 — creates a task with valid data', async () => {
       const res = await request(app.getHttpServer())
         .post('/tasks')
-        .send({
-          title: 'First Task',
-          deadline: futureDate,
-          projectId: String(createdProjectId),
-        });
+        .send({ title: 'First Task', deadline: taskDeadline, projectId: createdProjectId });
       check500(res, 'POST /tasks — valid');
 
       expect(res.status).toBe(201);
@@ -222,7 +228,7 @@ describe('Task/Project Tracking API (e2e)', () => {
     it('400 — missing title', async () => {
       const res = await request(app.getHttpServer())
         .post('/tasks')
-        .send({ deadline: futureDate, projectId: '1' });
+        .send({ deadline: taskDeadline, projectId: createdProjectId });
       check500(res, 'POST /tasks — missing title');
 
       expect(res.status).toBe(400);
@@ -231,7 +237,7 @@ describe('Task/Project Tracking API (e2e)', () => {
     it('400 — missing projectId', async () => {
       const res = await request(app.getHttpServer())
         .post('/tasks')
-        .send({ title: 'Task', deadline: futureDate });
+        .send({ title: 'Task', deadline: taskDeadline });
       check500(res, 'POST /tasks — missing projectId');
 
       expect(res.status).toBe(400);
@@ -240,21 +246,38 @@ describe('Task/Project Tracking API (e2e)', () => {
     it('400 — invalid deadline format', async () => {
       const res = await request(app.getHttpServer())
         .post('/tasks')
-        .send({ title: 'Task', deadline: 'bad-date', projectId: '1' });
+        .send({ title: 'Task', deadline: 'bad-date', projectId: createdProjectId });
       check500(res, 'POST /tasks — bad date');
 
       expect(res.status).toBe(400);
     });
 
+    it('400 — task deadline later than project deadline', async () => {
+      const tooLate = new Date(Date.now() + 60 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split('T')[0];
+
+      const res = await request(app.getHttpServer())
+        .post('/tasks')
+        .send({ title: 'Task', deadline: tooLate, projectId: createdProjectId });
+      check500(res, 'POST /tasks — deadline exceeds project');
+
+      expect(res.status).toBe(400);
+    });
+
+    it('404 — project not found', async () => {
+      const res = await request(app.getHttpServer())
+        .post('/tasks')
+        .send({ title: 'Task', deadline: taskDeadline, projectId: 99999 });
+      check500(res, 'POST /tasks — project not found');
+
+      expect(res.status).toBe(404);
+    });
+
     it('400 — extra unknown fields rejected', async () => {
       const res = await request(app.getHttpServer())
         .post('/tasks')
-        .send({
-          title: 'Task',
-          deadline: futureDate,
-          projectId: '1',
-          unknown: 'field',
-        });
+        .send({ title: 'Task', deadline: taskDeadline, projectId: createdProjectId, unknown: 'field' });
       check500(res, 'POST /tasks — unknown fields');
 
       expect(res.status).toBe(400);
@@ -281,9 +304,7 @@ describe('Task/Project Tracking API (e2e)', () => {
     });
 
     it('200 — returns empty array for unknown projectId', async () => {
-      const res = await request(app.getHttpServer()).get(
-        '/tasks?projectId=nonexistent-id',
-      );
+      const res = await request(app.getHttpServer()).get('/tasks?projectId=99999');
       check500(res, 'GET /tasks?projectId — unknown');
 
       expect(res.status).toBe(200);
@@ -293,9 +314,7 @@ describe('Task/Project Tracking API (e2e)', () => {
 
   describe('GET /tasks/:id', () => {
     it('200 — returns existing task', async () => {
-      const res = await request(app.getHttpServer()).get(
-        `/tasks/${createdTaskId}`,
-      );
+      const res = await request(app.getHttpServer()).get(`/tasks/${createdTaskId}`);
       check500(res, 'GET /tasks/:id — valid');
 
       expect(res.status).toBe(200);
@@ -309,6 +328,49 @@ describe('Task/Project Tracking API (e2e)', () => {
       check500(res, 'GET /tasks/:id — not found');
 
       expect(res.status).toBe(404);
+    });
+  });
+
+  describe('PUT /tasks/:id', () => {
+    it('200 — fully updates a task', async () => {
+      const res = await request(app.getHttpServer())
+        .put(`/tasks/${createdTaskId}`)
+        .send({ title: 'Updated Task', status: 'IN_PROGRESS', deadline: taskDeadline });
+      check500(res, 'PUT /tasks/:id — valid');
+
+      expect(res.status).toBe(200);
+      expect(res.body.title).toBe('Updated Task');
+    });
+
+    it('404 — update non-existent task', async () => {
+      const res = await request(app.getHttpServer())
+        .put('/tasks/00000000-0000-0000-0000-000000000000')
+        .send({ title: 'Task', status: 'DONE', deadline: taskDeadline });
+      check500(res, 'PUT /tasks/:id — not found');
+
+      expect(res.status).toBe(404);
+    });
+
+    it('400 — invalid status enum', async () => {
+      const res = await request(app.getHttpServer())
+        .put(`/tasks/${createdTaskId}`)
+        .send({ status: 'INVALID' });
+      check500(res, 'PUT /tasks/:id — bad enum');
+
+      expect(res.status).toBe(400);
+    });
+
+    it('400 — task deadline later than project deadline', async () => {
+      const tooLate = new Date(Date.now() + 60 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split('T')[0];
+
+      const res = await request(app.getHttpServer())
+        .put(`/tasks/${createdTaskId}`)
+        .send({ deadline: tooLate });
+      check500(res, 'PUT /tasks/:id — deadline exceeds project');
+
+      expect(res.status).toBe(400);
     });
   });
 
@@ -326,14 +388,14 @@ describe('Task/Project Tracking API (e2e)', () => {
     it('200 — updates task title', async () => {
       const res = await request(app.getHttpServer())
         .patch(`/tasks/${createdTaskId}`)
-        .send({ title: 'Updated Title' });
+        .send({ title: 'Patched Title' });
       check500(res, 'PATCH /tasks/:id — valid title');
 
       expect(res.status).toBe(200);
-      expect(res.body.title).toBe('Updated Title');
+      expect(res.body.title).toBe('Patched Title');
     });
 
-    it('404 — update non-existent task', async () => {
+    it('404 — patch non-existent task', async () => {
       const res = await request(app.getHttpServer())
         .patch('/tasks/00000000-0000-0000-0000-000000000000')
         .send({ status: 'DONE' });
@@ -350,13 +412,24 @@ describe('Task/Project Tracking API (e2e)', () => {
 
       expect(res.status).toBe(400);
     });
+
+    it('400 — task deadline later than project deadline', async () => {
+      const tooLate = new Date(Date.now() + 60 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split('T')[0];
+
+      const res = await request(app.getHttpServer())
+        .patch(`/tasks/${createdTaskId}`)
+        .send({ deadline: tooLate });
+      check500(res, 'PATCH /tasks/:id — deadline exceeds project');
+
+      expect(res.status).toBe(400);
+    });
   });
 
   describe('DELETE /tasks/:id', () => {
     it('200 — deletes existing task', async () => {
-      const res = await request(app.getHttpServer()).delete(
-        `/tasks/${createdTaskId}`,
-      );
+      const res = await request(app.getHttpServer()).delete(`/tasks/${createdTaskId}`);
       check500(res, 'DELETE /tasks/:id — valid');
 
       expect(res.status).toBe(200);
@@ -373,7 +446,23 @@ describe('Task/Project Tracking API (e2e)', () => {
   });
 
   describe('DELETE /projects/:id', () => {
-    it('200 — deletes existing project', async () => {
+    it('400 — delete project with existing tasks', async () => {
+      const projRes = await request(app.getHttpServer())
+        .post('/projects')
+        .send(validProject);
+      const projectId = projRes.body.data.id;
+
+      await request(app.getHttpServer())
+        .post('/tasks')
+        .send({ title: 'Blocking Task', deadline: taskDeadline, projectId });
+
+      const res = await request(app.getHttpServer()).delete(`/projects/${projectId}`);
+      check500(res, 'DELETE /projects/:id — has tasks');
+
+      expect(res.status).toBe(400);
+    });
+
+    it('200 — deletes project with no tasks', async () => {
       const res = await request(app.getHttpServer()).delete(
         `/projects/${createdProjectId}`,
       );
@@ -390,6 +479,10 @@ describe('Task/Project Tracking API (e2e)', () => {
       expect(res.status).toBe(404);
     });
   });
+
+  // ═══════════════════════════════════════
+  // 500 AUDIT
+  // ═══════════════════════════════════════
 
   describe('500 Audit', () => {
     it('must have 5 or fewer Error 500 occurrences', () => {
