@@ -13,7 +13,7 @@ export class TasksService {
     
   private tasks: Task[] = [];
 
-  constructor(private projectsService: ProjectService) {}
+  constructor(private projectService: ProjectService) {}
 
   findByProjectId(projectId: number): Task[] {
     return this.tasks.filter(task => task.projectId === projectId);
@@ -41,7 +41,7 @@ export class TasksService {
 
   createTask(dto: CreateTaskDto): Task {
 
-    const project = this.projectsService.getProjectById(dto.projectId);
+    const project = this.projectService.getProjectById(dto.projectId);
 
     if (!project) {
       throw new NotFoundException('Project not found');
@@ -88,7 +88,7 @@ export class TasksService {
         throw new BadRequestException('Invalid deadline');
       }
 
-      const project = this.projectsService.getProjectById(task.projectId);
+      const project = this.projectService.getProjectById(task.projectId);
 
       if (deadline > project.deadline) {
         throw new BadRequestException(
@@ -122,7 +122,7 @@ export class TasksService {
         throw new BadRequestException('Invalid deadline');
       }
 
-      const project = this.projectsService.getProjectById(task.projectId);
+      const project = this.projectService.getProjectById(task.projectId);
 
       if (deadline > project.deadline) {
         throw new BadRequestException(

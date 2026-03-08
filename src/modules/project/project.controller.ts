@@ -1,4 +1,4 @@
-import { Controller,Get,Post,Put,Delete,Param,Body,Patch,ParseIntPipe } from '@nestjs/common';
+import { Controller,Get,Post,Put,Delete,Param,Body,Patch,ParseIntPipe,BadRequestException } from '@nestjs/common';
 import { ProjectService } from './project.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { ApiResponse } from '../../common/interfaces/api-response.interface';
@@ -8,10 +8,14 @@ import { ApiTags } from '@nestjs/swagger';
 import { ApiResponse as SwaggerApiResponse,ApiOperation } from '@nestjs/swagger';
 
 
+
 @ApiTags('projects')
 @Controller('projects')
 export class ProjectController {
-  constructor(private readonly projectService: ProjectService) {}
+  constructor(
+    private readonly projectService: ProjectService,
+    
+  ) {}
 
   @ApiOperation({ summary: 'Create new projects' })
   @SwaggerApiResponse({ status: 201, description: 'Project created successfully' })
@@ -81,16 +85,8 @@ export class ProjectController {
   @ApiOperation({ summary: 'Delete project by id' })
   @SwaggerApiResponse({ status: 200, description: 'Project deleted successfully' })
   @Delete(':id')
-  remove(
-    @Param('id', ParseIntPipe) id: number,
-  ): ApiResponse<null> {
-    this.projectService.remove(id);
-
-    return {
-      success: true,
-      message: 'Project deleted successfully',
-      data: null,
-    };
+  remove(@Param('id') id: string) {
+    return this.projectService.remove(Number(id));
   }
 
   
