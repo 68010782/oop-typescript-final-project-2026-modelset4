@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Put,
   Patch,
   Delete,
   Param,
@@ -9,11 +10,10 @@ import {
   Query
 } from '@nestjs/common';
 
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { ApiTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
 
 @ApiTags('tasks')
 @Controller('tasks')
@@ -32,32 +32,41 @@ export class TasksController {
   @ApiResponse({ status: 200, description: 'Tasks retrieved successfully' })
   @Get()
   getTasks(@Query('projectId') projectId?: string) {
-    return this.tasksService.getAllTasks(Number(projectId!));
+
+    const projectIdNumber = projectId ? Number(projectId) : undefined;
+
+    return this.tasksService.getAllTasks(projectIdNumber);
   }
 
   @ApiOperation({ summary: 'Get task by id' })
   @ApiResponse({ status: 200, description: 'Task retrieved successfully' })
-  @ApiResponse({ status: 404, description: 'Task not found' })
   @Get(':id')
   getTask(@Param('id') id: string) {
     return this.tasksService.getTaskById(id);
   }
 
-  @ApiOperation({ summary: 'Update task partially' })
-  @ApiResponse({ status: 200, description: 'Task updated successfully' })
-  @Patch(':id')
-  updateTask(
-    @Param('id') id: string,
-    @Body() dto: UpdateTaskDto
-  ) {
+  @ApiOperation({ summary: 'Update task fully' })
+  @Put(':id')
+  updateTask(@Param('id') id: string, @Body() dto: UpdateTaskDto) {
     return this.tasksService.updateTask(id, dto);
   }
 
+  @ApiOperation({ summary: 'Update task partially' })
+  @Patch(':id')
+  patchTask(@Param('id') id: string, @Body() dto: UpdateTaskDto) {
+    return this.tasksService.patchTask(id, dto);
+  }
+
   @ApiOperation({ summary: 'Delete task by id' })
-  @ApiResponse({ status: 200, description: 'Task deleted successfully' })
   @Delete(':id')
   deleteTask(@Param('id') id: string) {
-    return this.tasksService.deleteTask(id);
+
+    this.tasksService.deleteTask(id);
+
+    return {
+      success: true,
+      message: 'Task deleted successfully'
+    };
   }
 
 }

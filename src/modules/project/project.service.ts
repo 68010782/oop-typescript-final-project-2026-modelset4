@@ -21,13 +21,18 @@ export class ProjectService {
     }
 
     const newProject: Project = {
-      id: this.nextId++,
-      name: dto.name,
-      description: dto.description,
-      status: dto.status,
-      deadline: deadlineDate,
-      createdAt: new Date(),
-    };
+  id: this.nextId++,
+  name: dto.name,
+  description: dto.description,
+  status: dto.status,
+  startDate: new Date(dto.startDate),
+  deadline: deadlineDate,
+  owner: dto.owner,
+  budget: dto.budget,
+  priority: dto.priority,
+  category: dto.category,
+  createdAt: new Date(dto.createdAt),
+};
 
     this.projects.push(newProject);
     return newProject;
@@ -59,7 +64,12 @@ export class ProjectService {
     project.name = dto.name;
     project.description = dto.description;
     project.status = dto.status;
+    project.startDate = new Date(dto.startDate);
     project.deadline = deadlineDate;
+    project.owner = dto.owner;
+    project.budget = dto.budget;
+    project.priority = dto.priority;
+    project.category = dto.category;
 
     return project;
   }
@@ -78,7 +88,7 @@ export class ProjectService {
       message: 'Project deleted successfully'
     };
   }
-  
+
   patch(id: number, dto: UpdateProjectDto): Project {
   const project = this.findOne(id);
 
@@ -105,6 +115,7 @@ export class ProjectService {
         project.status = dto.status;
       }
 
+      
     return project;
   }
   getProjectById(id: number): Project {
