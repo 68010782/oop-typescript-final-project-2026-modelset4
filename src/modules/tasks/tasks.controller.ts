@@ -24,7 +24,7 @@ export class TasksController {
     constructor(private tasksService: TasksService) {}
 
     @ApiOperation({ summary: 'Create new tasks' })
-    @ApiResponse({ status: 200, description: 'Task created successfully' })
+    @ApiResponse({ status: 201, description: 'Task created successfully' })
     @Post()
     createTask(@Body() dto: CreateTaskDto){
         return this.tasksService.createTask(dto);
@@ -59,7 +59,7 @@ export class TasksController {
     }
 
     @ApiOperation({ summary: 'Delete task by id' })
-    @ApiResponse({ status: 200, description: 'Task deleted successfully' })
+    @ApiResponse({ status: 201, description: 'Task deleted successfully' })
     @Delete(':id')
     deleteTask(@Param('id') id: string){
         return this.tasksService.deleteTask(id);
