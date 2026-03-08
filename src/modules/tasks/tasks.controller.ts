@@ -59,7 +59,7 @@ export class TasksController {
     }
 
     @ApiOperation({ summary: 'Delete task by id' })
-    @ApiResponse({ status: 201, description: 'Task deleted successfully' })
+    @ApiResponse({ status: 200, description: 'Task deleted successfully' })
     @Delete(':id')
     deleteTask(@Param('id') id: string){
         return this.tasksService.deleteTask(id);
