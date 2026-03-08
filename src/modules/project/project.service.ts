@@ -112,5 +112,15 @@ export class ProjectService {
 
     return project;
   }
+  getProjectById(id: number): Project {
+
+    const project = this.projects.find(p => p.id === id);
+
+    if (!project) {
+      throw new NotFoundException('Project not found');
+    }
+
+    return project;
+  }
 }
 
