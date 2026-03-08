@@ -1,16 +1,17 @@
-import { Injectable,BadRequestException,NotFoundException } from '@nestjs/common';
+import { Injectable,BadRequestException,NotFoundException,forwardRef,Inject } from '@nestjs/common';
 import { Project } from './project.interface';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
-import { TasksService } from '../tasks/tasks.service';
+//import { TasksService } from '../tasks/tasks.service';
 
 @Injectable()
 export class ProjectService {
   private projects: Project[] = [];
   private nextId = 1;
-  constructor(
+  /*constructor(
+  @Inject(forwardRef(() => TasksService))
   private readonly tasksService: TasksService
-  ) {}
+  ) {}*/
 
   create(dto: CreateProjectDto): Project {
     const deadlineDate = new Date(dto.deadline);
@@ -64,13 +65,6 @@ export class ProjectService {
   }
 
   remove(id: number) {
-    const tasks = this.tasksService.findByProjectId(id);
-
-    if (tasks.length > 0) {
-      throw new BadRequestException(
-        'Cannot delete project with existing tasks',
-      );
-    }
 
     const index = this.projects.findIndex(p => p.id === id);
 
@@ -84,6 +78,7 @@ export class ProjectService {
       message: 'Project deleted successfully'
     };
   }
+  
   patch(id: number, dto: UpdateProjectDto): Project {
   const project = this.findOne(id);
 
