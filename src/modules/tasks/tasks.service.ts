@@ -1,16 +1,13 @@
-import { Injectable, NotFoundException,BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { Task } from './task.interface';
-import { TaskStatus } from './task-status.enum';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import {v4 as uuid} from 'uuid';
+import { v4 as uuid } from 'uuid';
 import { ProjectService } from '../project/project.service';
-
 
 @Injectable()
 export class TasksService {
 
-    
   private tasks: Task[] = [];
 
   constructor(private projectService: ProjectService) {}
@@ -62,9 +59,14 @@ export class TasksService {
     const task: Task = {
       id: uuid(),
       title: dto.title,
+      description: dto.description,
+      status: dto.status,
+      priority: dto.priority,
       deadline: deadline,
+      assignedTo: dto.assignedTo,
       projectId: dto.projectId,
-      status: TaskStatus.OPEN
+      createdAt: new Date(dto.createdAt),
+      updatedAt: new Date(dto.updatedAt),
     };
 
     this.tasks.push(task);
@@ -80,6 +82,18 @@ export class TasksService {
       task.title = dto.title;
     }
 
+    if (dto.description !== undefined) {
+      task.description = dto.description;
+    }
+
+    if (dto.priority !== undefined) {
+      task.priority = dto.priority;
+    }
+
+    if (dto.assignedTo !== undefined) {
+      task.assignedTo = dto.assignedTo;
+    }
+
     if (dto.deadline !== undefined) {
 
       const deadline = new Date(dto.deadline);
@@ -102,6 +116,8 @@ export class TasksService {
     if (dto.status !== undefined) {
       task.status = dto.status;
     }
+
+    task.updatedAt = new Date();
 
     return task;
   }
@@ -114,6 +130,18 @@ export class TasksService {
       task.title = dto.title;
     }
 
+    if (dto.description !== undefined) {
+      task.description = dto.description;
+    }
+
+    if (dto.priority !== undefined) {
+      task.priority = dto.priority;
+    }
+
+    if (dto.assignedTo !== undefined) {
+      task.assignedTo = dto.assignedTo;
+    }
+
     if (dto.deadline !== undefined) {
 
       const deadline = new Date(dto.deadline);
@@ -136,6 +164,8 @@ export class TasksService {
     if (dto.status !== undefined) {
       task.status = dto.status;
     }
+
+    task.updatedAt = new Date();
 
     return task;
   }

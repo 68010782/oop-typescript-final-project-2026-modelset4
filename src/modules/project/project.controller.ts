@@ -6,7 +6,7 @@ import { Project } from './project.interface';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { ApiResponse as SwaggerApiResponse,ApiOperation } from '@nestjs/swagger';
-
+import { TasksService } from '../tasks/tasks.service';
 
 
 @ApiTags('projects')
@@ -14,7 +14,7 @@ import { ApiResponse as SwaggerApiResponse,ApiOperation } from '@nestjs/swagger'
 export class ProjectController {
   constructor(
     private readonly projectService: ProjectService,
-    
+    private readonly tasksService: TasksService,
   ) {}
 
   @ApiOperation({ summary: 'Create new projects' })
@@ -86,8 +86,18 @@ export class ProjectController {
   @SwaggerApiResponse({ status: 200, description: 'Project deleted successfully' })
   @Delete(':id')
   remove(@Param('id') id: string) {
+
+    const tasks = this.tasksService.findByProjectId(Number(id));
+
+    if (tasks.length > 0) {
+      throw new BadRequestException(
+        'Cannot delete project with existing tasks'
+      );
+    }
+
     return this.projectService.remove(Number(id));
   }
+
 
   
 }
