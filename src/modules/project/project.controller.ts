@@ -13,6 +13,8 @@ import { ApiResponse as SwaggerApiResponse,ApiOperation } from '@nestjs/swagger'
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
+  @ApiOperation({ summary: 'Create new projects' })
+  @SwaggerApiResponse({ status: 201, description: 'Project created successfully' })
   @Post()
   create(@Body() dto: CreateProjectDto): ApiResponse<Project> {
     const project = this.projectService.create(dto);
@@ -35,6 +37,8 @@ export class ProjectController {
     };
   }
 
+  @ApiOperation({ summary: 'Get project by id' })
+  @SwaggerApiResponse({ status: 200, description: 'Project retrieved successfully' })
   @Get(':id')
   findOne(
     @Param('id', ParseIntPipe) id: number,
@@ -46,6 +50,8 @@ export class ProjectController {
     };
   }
 
+  @ApiOperation({ summary: 'Put project by id' })
+  @SwaggerApiResponse({ status: 200, description: 'Project updated successfully' })
   @Put(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -57,7 +63,23 @@ export class ProjectController {
       data: this.projectService.update(id, dto),
     };
   }
+   
+  @ApiOperation({ summary: 'Patch project by id' })
+  @SwaggerApiResponse({ status: 200, description: 'Project updated partially' })
+  @Patch(':id')
+    patch(
+     @Param('id', ParseIntPipe) id: number,
+     @Body() dto: UpdateProjectDto,
+    ): ApiResponse<Project> {
+    return {
+        success: true,
+        message: 'Project updated partially',
+        data: this.projectService.patch(id, dto),
+      };
+  }
 
+  @ApiOperation({ summary: 'Delete project by id' })
+  @SwaggerApiResponse({ status: 200, description: 'Project deleted successfully' })
   @Delete(':id')
   remove(
     @Param('id', ParseIntPipe) id: number,
@@ -71,15 +93,5 @@ export class ProjectController {
     };
   }
 
-    @Patch(':id')
-    patch(
-     @Param('id', ParseIntPipe) id: number,
-     @Body() dto: UpdateProjectDto,
-    ): ApiResponse<Project> {
-    return {
-        success: true,
-        message: 'Project updated partially',
-        data: this.projectService.patch(id, dto),
-        };
-    }
+  
 }

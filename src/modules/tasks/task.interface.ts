@@ -6,6 +6,6 @@ export interface Task{
     title: string;
     status: TaskStatus;
     deadline: Date;
-    projectId: string;
+    projectId: number;
     
 }
